@@ -44,6 +44,8 @@
 		LEFT: "RIGHT"
 	}
 
+	let GAME_STATE = "PLAY"
+
 	const BOARD = {
 		width: 30,
 		height: 30,
@@ -59,7 +61,7 @@
 		lastDirection: direction,
 		nextDirection: direction
 	} = {
-		body: [{x: 4, y: 3}, {x: 4, y: 4}, {x: 4, y: 5}, {x: 4, y: 6}, {x: 5, y: 3},],
+		body: [{x: 4, y: 3}, {x: 4, y: 4}, {x: 4, y: 5}, {x: 4, y: 6}, {x: 5, y: 6},],
 		lastDirection: "RIGHT",
 		nextDirection: "DOWN"
 	}
@@ -68,6 +70,11 @@
 	canvas.height = BOARD.pixel_size * BOARD.height
 
 	context.scale(BOARD.pixel_size, BOARD.pixel_size)
+
+	function setGameOver(){
+		GAME_STATE = "GAME_OVER"
+		alert("GAME_OVER")
+	}
 
 	function drawBoard (){
 		context.fillStyle = "#000"
@@ -88,6 +95,10 @@
 
 	function leavesBoard(x: number, y:number){
 		return x >= BOARD.width || y >= BOARD.width|| x < 0 || y < 0
+	}
+
+	function touchesSnakeBody({ x, y }: coordenates){
+		return !!SNAKE.body.find(({x: x1, y: y1}) => x === x1 && y === y1)
 	}
 
 	function updateSnakeBody() {
@@ -117,15 +128,19 @@
 				: nextMove = {x: head.x, y: head.y - 1}
 				break
 		}
-		SNAKE.lastDirection = SNAKE.nextDirection
-		SNAKE.body = [...SNAKE.body, nextMove]
-		if(nextMove.x === BOARD.goal.x && nextMove.y === BOARD.goal.y){
-			BOARD.goal = {
-				x: Math.floor(Math.random() * BOARD.width),
-				y: Math.floor(Math.random() * BOARD.height)
-			}
+		if (touchesSnakeBody(nextMove)){
+			setGameOver()
 		}else{
-			SNAKE.body.shift()
+			SNAKE.lastDirection = SNAKE.nextDirection
+			SNAKE.body = [...SNAKE.body, nextMove]
+			if(nextMove.x === BOARD.goal.x && nextMove.y === BOARD.goal.y){
+				BOARD.goal = {
+					x: Math.floor(Math.random() * BOARD.width),
+					y: Math.floor(Math.random() * BOARD.height)
+				}
+			}else{
+				SNAKE.body.shift()
+			}
 		}
 	}
 
@@ -149,11 +164,21 @@
 	})
 	
 	function update() {
-		updateSnakeBody()
-		drawBoard()
-		drawSnake()
-		drawGoal()
-		window.requestAnimationFrame(update)
+		switch(GAME_STATE){
+			case "PLAY":{
+				updateSnakeBody()
+				drawBoard()
+				drawSnake()
+				drawGoal()
+				break
+			}
+			case "GAME_OVER":{
+				return
+			}
+		}
+		setTimeout(() => {
+			window.requestAnimationFrame(update)
+		}, 500);
 	}
 
 	update()

@@ -38,6 +38,19 @@
 		x: number
 		y: number
 	}
+	type GameState = {
+		board: {
+			width: number
+			height: number
+			pixel_size: number
+		},
+		goal: coordenates,
+		snake: {
+			body: coordenates[]
+			lastDirection: direction
+			nextDirection: direction
+		}
+	}
 	
 	const OPOSITE_DIRECTION = {
 		DOWN: "UP",
@@ -46,7 +59,7 @@
 		LEFT: "RIGHT"
 	}
 
-	const INITIAL_STATE = {
+	const INITIAL_STATE: GameState = {
 		board: {
 			width: 30,
 			height: 30,
@@ -58,8 +71,8 @@
 		},
 		snake : {
 			body: [{x: 14, y: 0}, {x: 14, y: 1},],
-			lastDirection: "UP" as direction,
-			nextDirection: "DOWN" as direction
+			lastDirection: "UP",
+			nextDirection: "DOWN"
 		}
 	}
 
@@ -172,6 +185,7 @@
 					
 		}
 	})
+
 	resetButton?.addEventListener("click", resetGame)
 	
 	function update() {

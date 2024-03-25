@@ -119,7 +119,14 @@
 		}
 		SNAKE.lastDirection = SNAKE.nextDirection
 		SNAKE.body = [...SNAKE.body, nextMove]
-		SNAKE.body.shift()
+		if(nextMove.x === BOARD.goal.x && nextMove.y === BOARD.goal.y){
+			BOARD.goal = {
+				x: Math.floor(Math.random() * BOARD.width),
+				y: Math.floor(Math.random() * BOARD.height)
+			}
+		}else{
+			SNAKE.body.shift()
+		}
 	}
 
 	function goesBack(direction: direction) {

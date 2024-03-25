@@ -124,6 +124,13 @@
 		return !!SNAKE.body.find(({x: x1, y: y1}) => x === x1 && y === y1)
 	}
 
+	function generateRandomPointOnBoard(): coordenates {
+		return {
+				x: Math.floor(Math.random() * BOARD.width),
+				y: Math.floor(Math.random() * BOARD.height)
+			}
+	}
+
 	function updateSnakeBody() {
 		const snakeHead = SNAKE.body.slice(-1)
 		const head = snakeHead[0]
@@ -157,10 +164,9 @@
 			SNAKE.lastDirection = SNAKE.nextDirection
 			SNAKE.body = [...SNAKE.body, nextMove]
 			if(nextMove.x === GOAL.x && nextMove.y === GOAL.y){
-				GOAL = {
-					x: Math.floor(Math.random() * BOARD.width),
-					y: Math.floor(Math.random() * BOARD.height)
-				}
+				do{
+					GOAL = generateRandomPointOnBoard()
+				} while (touchesSnakeBody(GOAL))
 			} else {
 				SNAKE.body.shift()
 			}

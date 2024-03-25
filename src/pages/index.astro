@@ -37,6 +37,12 @@
 		pixel_size: 10
 	}
 
+	const SNAKE = {
+		body: [[4,3],[4,4],[4,5],[4,6],[5,6]],
+		lastDirection: "RIGHT",
+		nextDirection: "RIGHT"
+	}
+
 	canvas.width = BOARD.pixel_size * BOARD.width
 	canvas.height = BOARD.pixel_size * BOARD.height
 
@@ -47,8 +53,16 @@
 		context.fillRect(0, 0, canvas.width, canvas.height)
 	}
 
+	function drawSnake (){
+		context.fillStyle = "#fff"
+		SNAKE.body.forEach(([a,b])=>{
+			context.fillRect(a, b, 1, 1)
+		})
+	}
+	
 	function drawFrame (){
 		drawBoard()
+		drawSnake()
 	}
 
 	drawFrame()

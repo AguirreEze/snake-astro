@@ -12,6 +12,7 @@
 	</head>
 	<body>
 		<h1>Snake</h1>
+		<button id="reset">Reset</button>
 		<canvas></canvas>
 	</body>
 </html>
@@ -28,6 +29,7 @@
 
 
 <script>
+	const resetButton = document.getElementById("reset")
 	const canvas = document.querySelector("canvas") as HTMLCanvasElement
 	const context = canvas.getContext("2d") as CanvasRenderingContext2D
 
@@ -62,9 +64,10 @@
 	}
 
 	let GAME_STATE = "PLAY"
-	let BOARD = INITIAL_STATE.board
-	let SNAKE= INITIAL_STATE.snake
-	let GOAL = INITIAL_STATE.goal
+	// Generates new object, not pass as reference
+	let BOARD = {...INITIAL_STATE.board}
+	let SNAKE= {...INITIAL_STATE.snake}
+	let GOAL = {...INITIAL_STATE.goal}
 
 	canvas.width = BOARD.pixel_size * BOARD.width
 	canvas.height = BOARD.pixel_size * BOARD.height
@@ -74,6 +77,13 @@
 	function setGameOver(){
 		GAME_STATE = "GAME_OVER"
 		alert("GAME_OVER")
+	}
+
+	function resetGame() {
+		GAME_STATE = "PLAY"
+		BOARD = {...INITIAL_STATE.board}
+		SNAKE= {...INITIAL_STATE.snake}
+		GOAL = {...INITIAL_STATE.goal}
 	}
 
 	function drawBoard (){
@@ -162,6 +172,7 @@
 					
 		}
 	})
+	resetButton?.addEventListener("click", resetGame)
 	
 	function update() {
 		switch(GAME_STATE){
@@ -173,7 +184,7 @@
 				break
 			}
 			case "GAME_OVER":{
-				return
+				break
 			}
 		}
 		setTimeout(() => {

@@ -35,8 +35,8 @@
 	type coordenates = {
 		x: number
 		y: number
-	} 
-
+	}
+	
 	const OPOSITE_DIRECTION = {
 		DOWN: "UP",
 		UP: "DOWN",
@@ -44,27 +44,27 @@
 		LEFT: "RIGHT"
 	}
 
-	let GAME_STATE = "PLAY"
-
-	const BOARD = {
-		width: 30,
-		height: 30,
-		pixel_size: 10,
+	const INITIAL_STATE = {
+		board: {
+			width: 30,
+			height: 30,
+			pixel_size: 10,
+		},
 		goal: {
 			x: 17,
 			y: 12
+		},
+		snake : {
+			body: [{x: 14, y: 0}, {x: 14, y: 1},],
+			lastDirection: "UP" as direction,
+			nextDirection: "DOWN" as direction
 		}
 	}
 
-	const SNAKE: {
-		body: coordenates[],
-		lastDirection: direction,
-		nextDirection: direction
-	} = {
-		body: [{x: 4, y: 3}, {x: 4, y: 4}, {x: 4, y: 5}, {x: 4, y: 6}, {x: 5, y: 6},],
-		lastDirection: "RIGHT",
-		nextDirection: "DOWN"
-	}
+	let GAME_STATE = "PLAY"
+	let BOARD = INITIAL_STATE.board
+	let SNAKE= INITIAL_STATE.snake
+	let GOAL = INITIAL_STATE.goal
 
 	canvas.width = BOARD.pixel_size * BOARD.width
 	canvas.height = BOARD.pixel_size * BOARD.height
@@ -90,7 +90,7 @@
 
 	function drawGoal() {
 		context.fillStyle = "yellow"
-		context.fillRect(BOARD.goal.x, BOARD.goal.y, 1, 1)
+		context.fillRect(GOAL.x, GOAL.y, 1, 1)
 	}
 
 	function leavesBoard(x: number, y:number){
@@ -130,15 +130,15 @@
 		}
 		if (touchesSnakeBody(nextMove)){
 			setGameOver()
-		}else{
+		} else {
 			SNAKE.lastDirection = SNAKE.nextDirection
 			SNAKE.body = [...SNAKE.body, nextMove]
-			if(nextMove.x === BOARD.goal.x && nextMove.y === BOARD.goal.y){
-				BOARD.goal = {
+			if(nextMove.x === GOAL.x && nextMove.y === GOAL.y){
+				GOAL = {
 					x: Math.floor(Math.random() * BOARD.width),
 					y: Math.floor(Math.random() * BOARD.height)
 				}
-			}else{
+			} else {
 				SNAKE.body.shift()
 			}
 		}
@@ -178,7 +178,7 @@
 		}
 		setTimeout(() => {
 			window.requestAnimationFrame(update)
-		}, 500);
+		}, 1000 / 30);
 	}
 
 	update()

@@ -11,6 +11,45 @@
 		<title>Astro</title>
 	</head>
 	<body>
-		<h1>Astro</h1>
+		<h1>Snake</h1>
+		<canvas></canvas>
 	</body>
 </html>
+
+<style>
+	body{
+		margin: 0;
+		padding: 0;
+		display: grid;
+		place-content: center;
+		min-height: 100vh;
+	}
+</style>
+
+
+<script>
+	const canvas = document.querySelector("canvas") as HTMLCanvasElement
+	const context = canvas.getContext("2d") as CanvasRenderingContext2D
+
+	const BOARD = {
+		width: 30,
+		height: 30,
+		pixel_size: 10
+	}
+
+	canvas.width = BOARD.pixel_size * BOARD.width
+	canvas.height = BOARD.pixel_size * BOARD.height
+
+	context.scale(BOARD.pixel_size, BOARD.pixel_size)
+
+	function drawBoard (){
+		context.fillStyle = "#000"
+		context.fillRect(0, 0, canvas.width, canvas.height)
+	}
+
+	function drawFrame (){
+		drawBoard()
+	}
+
+	drawFrame()
+</script>

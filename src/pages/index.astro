@@ -32,6 +32,10 @@
 	const context = canvas.getContext("2d") as CanvasRenderingContext2D
 
 	type direction = "UP" | "DOWN" | "RIGHT" | "LEFT"
+	type coordenates = {
+		x: number
+		y: number
+	} 
 
 	const OPOSITE_DIRECTION = {
 		DOWN: "UP",
@@ -44,15 +48,18 @@
 		width: 30,
 		height: 30,
 		pixel_size: 10,
-		goal: [17, 12]
+		goal: {
+			x: 17,
+			y: 12
+		}
 	}
 
 	const SNAKE: {
-		body: number[][],
+		body: coordenates[],
 		lastDirection: direction,
 		nextDirection: direction
 	} = {
-		body: [[4,3],[4,4],[4,5],[4,6],[5,6]],
+		body: [{x: 4, y: 3}, {x: 4, y: 4}, {x: 4, y: 5}, {x: 4, y: 6}, {x: 5, y: 3},],
 		lastDirection: "RIGHT",
 		nextDirection: "DOWN"
 	}
@@ -69,47 +76,45 @@
 
 	function drawSnake (){
 		context.fillStyle = "#fff"
-		SNAKE.body.forEach(([a,b])=>{
-			context.fillRect(a, b, 1, 1)
+		SNAKE.body.forEach(({x, y})=>{
+			context.fillRect(x, y, 1, 1)
 		})
 	}
 
 	function drawGoal() {
 		context.fillStyle = "yellow"
-		context.fillRect(BOARD.goal[0], BOARD.goal[1], 1, 1)
+		context.fillRect(BOARD.goal.x, BOARD.goal.y, 1, 1)
 	}
 
-	function leavesBoard([x, y]: number[]){
+	function leavesBoard(x: number, y:number){
 		return x >= BOARD.width || y >= BOARD.width|| x < 0 || y < 0
 	}
 
 	function updateSnakeBody() {
 		const snakeHead = SNAKE.body.slice(-1)
-		const [headX, headY] = snakeHead[0]
-
-		let nextMove: number[]
-
+		const head = snakeHead[0]
+		let nextMove: coordenates
 
 		switch(SNAKE.nextDirection){
 			case "RIGHT":
-				leavesBoard([headX + 1, headY])
-				? nextMove = [0, headY]
-				: nextMove = [headX + 1, headY]
+				leavesBoard(head.x + 1, head.y)
+				? nextMove = {x: 0, y: head.y}
+				: nextMove = {x: head.x + 1, y: head.y}
 				break
 			case "LEFT":
-				leavesBoard([headX - 1, headY])
-				? nextMove = [BOARD.width - 1, headY]
-				: nextMove = [headX -1, headY]
+				leavesBoard(head.x - 1, head.y)
+				? nextMove = {x: BOARD.width - 1, y: head.y}
+				: nextMove = {x: head.x -1, y: head.y}
 				break
 			case "DOWN":
-				leavesBoard([headX, headY + 1])
-				? nextMove = [headX, 0]
-				: nextMove = [headX, headY + 1]
+				leavesBoard(head.x, head.y + 1)
+				? nextMove = {x: head.x, y: 0}
+				: nextMove = {x: head.x, y: head.y + 1}
 				break
 			case "UP":
-				leavesBoard([headX, headY - 1])
-				? nextMove = [headX, BOARD.height - 1]
-				: nextMove = [headX, headY - 1]
+				leavesBoard(head.x, head.y - 1)
+				? nextMove = {x: head.x, y: BOARD.height - 1}
+				: nextMove = {x: head.x, y: head.y - 1}
 				break
 		}
 		SNAKE.lastDirection = SNAKE.nextDirection

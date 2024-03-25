@@ -31,16 +31,30 @@
 	const canvas = document.querySelector("canvas") as HTMLCanvasElement
 	const context = canvas.getContext("2d") as CanvasRenderingContext2D
 
+	type direction = "UP" | "DOWN" | "RIGHT" | "LEFT"
+
+	const OPOSITE_DIRECTION = {
+		DOWN: "UP",
+		UP: "DOWN",
+		RIGHT: "LEFT",
+		LEFT: "RIGHT"
+	}
+
 	const BOARD = {
 		width: 30,
 		height: 30,
-		pixel_size: 10
+		pixel_size: 10,
+		goal: [17, 12]
 	}
 
-	const SNAKE = {
+	const SNAKE: {
+		body: number[][],
+		lastDirection: direction,
+		nextDirection: direction
+	} = {
 		body: [[4,3],[4,4],[4,5],[4,6],[5,6]],
 		lastDirection: "RIGHT",
-		nextDirection: "RIGHT"
+		nextDirection: "DOWN"
 	}
 
 	canvas.width = BOARD.pixel_size * BOARD.width
@@ -59,11 +73,77 @@
 			context.fillRect(a, b, 1, 1)
 		})
 	}
-	
-	function drawFrame (){
-		drawBoard()
-		drawSnake()
+
+	function drawGoal() {
+		context.fillStyle = "yellow"
+		context.fillRect(BOARD.goal[0], BOARD.goal[1], 1, 1)
 	}
 
-	drawFrame()
+	function leavesBoard([x, y]: number[]){
+		return x > BOARD.width || y > BOARD.width || x < 0 || y < 0
+	}
+
+	function updateSnakeBody() {
+		const snakeHead = SNAKE.body.slice(-1)
+		const [headX, headY] = snakeHead[0]
+
+		let nextMove: number[]
+
+
+		switch(SNAKE.nextDirection){
+			case "RIGHT":
+				leavesBoard([headX + 1, headY])
+				? nextMove = [0, headY]
+				: nextMove = [headX + 1, headY]
+				break
+			case "LEFT":
+				leavesBoard([headX - 1, headY])
+				? nextMove = [BOARD.width, headY]
+				: nextMove = [headX -1, headY]
+				break
+			case "DOWN":
+				leavesBoard([headX, headY + 1])
+				? nextMove = [headX, 0]
+				: nextMove = [headX, headY + 1]
+				break
+			case "UP":
+				leavesBoard([headX, headY - 1])
+				? nextMove = [headX, BOARD.height]
+				: nextMove = [headX, headY - 1]
+				break
+		}
+
+		SNAKE.lastDirection = SNAKE.nextDirection
+		SNAKE.body = [...SNAKE.body, nextMove]
+		SNAKE.body.shift()
+	}
+
+	function goesBack(direction: direction) {
+		return OPOSITE_DIRECTION[direction] === SNAKE.lastDirection
+	}
+
+	window.addEventListener("keydown", (e)=>{
+		e.preventDefault()
+		switch(e.key){
+			case "ArrowUp":
+				return goesBack("UP") ? null : SNAKE.nextDirection = "UP"
+			case "ArrowDown":
+				return goesBack("DOWN") ? null : SNAKE.nextDirection = "DOWN"
+			case "ArrowRight":
+				return goesBack("RIGHT") ? null : SNAKE.nextDirection = "RIGHT"
+			case "ArrowLeft":
+				return goesBack("LEFT") ? null : SNAKE.nextDirection = "LEFT"
+					
+		}
+	})
+	
+	function update() {
+		updateSnakeBody()
+		drawBoard()
+		drawSnake()
+		drawGoal()
+		window.requestAnimationFrame(update)
+	}
+
+	update()
 </script>

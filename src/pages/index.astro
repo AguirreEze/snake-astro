@@ -80,7 +80,7 @@
 	}
 
 	function leavesBoard([x, y]: number[]){
-		return x > BOARD.width || y > BOARD.width || x < 0 || y < 0
+		return x >= BOARD.width || y >= BOARD.width|| x < 0 || y < 0
 	}
 
 	function updateSnakeBody() {
@@ -98,7 +98,7 @@
 				break
 			case "LEFT":
 				leavesBoard([headX - 1, headY])
-				? nextMove = [BOARD.width, headY]
+				? nextMove = [BOARD.width - 1, headY]
 				: nextMove = [headX -1, headY]
 				break
 			case "DOWN":
@@ -108,11 +108,10 @@
 				break
 			case "UP":
 				leavesBoard([headX, headY - 1])
-				? nextMove = [headX, BOARD.height]
+				? nextMove = [headX, BOARD.height - 1]
 				: nextMove = [headX, headY - 1]
 				break
 		}
-
 		SNAKE.lastDirection = SNAKE.nextDirection
 		SNAKE.body = [...SNAKE.body, nextMove]
 		SNAKE.body.shift()

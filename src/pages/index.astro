@@ -12,24 +12,45 @@
 	</head>
 	<body>
 		<h1>Snake</h1>
-		<button id="reset">Reset</button>
 		<canvas></canvas>
+		<button id="play">Start (Space)</button>
+		<button id="reset">Reset (Enter)</button>
 	</body>
 </html>
 
 <style>
+	:root{
+		font-family: Inter, system-ui, Arial, Helvetica, sans-serif;
+
+		color-scheme: dark light;
+		color: rgba(255, 255, 255, 8.7);
+		background-color: #242424;
+
+		font-synthesis: none;
+		text-rendering: optimizeLegibility;
+	}
 	body{
 		margin: 0;
 		padding: 0;
 		display: grid;
+		gap: .5rem;
 		place-content: center;
 		min-height: 100vh;
+	}
+	h1{
+		text-align: center;
+		margin: 0;
+	}
+	button{
+		border-radius: .5rem;
+		padding: .3rem;
 	}
 </style>
 
 
 <script>
 	const resetButton = document.getElementById("reset")
+	const playButton = document.getElementById("play") as HTMLElement
 	const canvas = document.querySelector("canvas") as HTMLCanvasElement
 	const context = canvas.getContext("2d") as CanvasRenderingContext2D
 
@@ -76,7 +97,7 @@
 		}
 	}
 
-	let GAME_STATE = "PLAY"
+	let GAME_STATE = "PAUSE"
 	// Generates new object, not pass as reference
 	let BOARD = {...INITIAL_STATE.board}
 	let SNAKE= {...INITIAL_STATE.snake}
@@ -89,14 +110,30 @@
 
 	function setGameOver(){
 		GAME_STATE = "GAME_OVER"
+		playButton.setAttribute("disabled", "")
 		alert("GAME_OVER")
 	}
 
 	function resetGame() {
-		GAME_STATE = "PLAY"
+		// resets start button
+		playButton.innerHTML = "Start (Space)"
+		playButton.removeAttribute("disabled")
+		// resets board/game states
+		GAME_STATE = "PAUSE"
 		BOARD = {...INITIAL_STATE.board}
 		SNAKE= {...INITIAL_STATE.snake}
 		GOAL = {...INITIAL_STATE.goal}
+	}
+
+	function togglePause() {
+		if(GAME_STATE === "PAUSE"){
+			GAME_STATE = "PLAY"
+			playButton.innerHTML = "Pause (Space)"
+		}else if (GAME_STATE === "PLAY"){
+			GAME_STATE = "PAUSE"
+			playButton.innerHTML = "Play (Space)"
+		}
+
 	}
 
 	function drawBoard (){
@@ -181,21 +218,31 @@
 		e.preventDefault()
 		switch(e.key){
 			case "ArrowUp":
-				return goesBack("UP") ? null : SNAKE.nextDirection = "UP"
+				return goesBack("UP") || GAME_STATE !== "PLAY"  ? null : SNAKE.nextDirection = "UP"
 			case "ArrowDown":
-				return goesBack("DOWN") ? null : SNAKE.nextDirection = "DOWN"
+				return goesBack("DOWN") || GAME_STATE !== "PLAY"  ? null : SNAKE.nextDirection = "DOWN"
 			case "ArrowRight":
-				return goesBack("RIGHT") ? null : SNAKE.nextDirection = "RIGHT"
+				return goesBack("RIGHT") || GAME_STATE !== "PLAY" ? null : SNAKE.nextDirection = "RIGHT"
 			case "ArrowLeft":
-				return goesBack("LEFT") ? null : SNAKE.nextDirection = "LEFT"
-					
+				return goesBack("LEFT") || GAME_STATE !== "PLAY"  ? null : SNAKE.nextDirection = "LEFT"
+			case "Enter":
+				return resetGame()
+			case " ":
+				return togglePause()
 		}
 	})
 
 	resetButton?.addEventListener("click", resetGame)
+	playButton?.addEventListener("click", togglePause)
 	
 	function update() {
 		switch(GAME_STATE){
+			case "PAUSE":{
+				drawBoard()
+				drawSnake()
+				drawGoal()
+				break
+			}
 			case "PLAY":{
 				updateSnakeBody()
 				drawBoard()

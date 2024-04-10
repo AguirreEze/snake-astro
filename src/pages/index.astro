@@ -1,5 +1,4 @@
 ---
-
 ---
 
 <html lang="en">
@@ -12,6 +11,12 @@
 	</head>
 	<body>
 		<h1>Snake</h1>
+		<div>
+			<h2>Score</h2>
+			<span id="scoreDisplay">0</span>
+			<h2>Top Score</h2>
+			<span id="topScore">0</span>
+		</div>
 		<canvas></canvas>
 		<button id="play">Start (Space)</button>
 		<button id="reset">Reset (Enter)</button>
@@ -37,7 +42,13 @@
 		place-content: center;
 		min-height: 100vh;
 	}
-	h1{
+	div{
+		display: grid;
+		grid-auto-flow: column;
+		grid-template-columns: 50% 50%;
+		grid-template-rows: 1fr 1fr;
+	}
+	h1, h2, span{
 		text-align: center;
 		margin: 0;
 	}
@@ -51,6 +62,8 @@
 <script>
 	const resetButton = document.getElementById("reset")
 	const playButton = document.getElementById("play") as HTMLElement
+	const scoreDisplay = document.getElementById("scoreDisplay") as HTMLElement
+	const topScore = document.getElementById("topScore") as HTMLElement
 	const canvas = document.querySelector("canvas") as HTMLCanvasElement
 	const context = canvas.getContext("2d") as CanvasRenderingContext2D
 
@@ -102,19 +115,35 @@
 	let BOARD = {...INITIAL_STATE.board}
 	let SNAKE= {...INITIAL_STATE.snake}
 	let GOAL = {...INITIAL_STATE.goal}
+	let TOP_SCORE = window.localStorage.getItem("topScore") || "0"
+	let SCORE = 0
+
+	updateUIElement(topScore, TOP_SCORE)
 
 	canvas.width = BOARD.pixel_size * BOARD.width
 	canvas.height = BOARD.pixel_size * BOARD.height
 
 	context.scale(BOARD.pixel_size, BOARD.pixel_size)
 
+	function isNewTopScore() {
+		return SCORE > parseInt(TOP_SCORE)
+	}
+
 	function setGameOver(){
 		GAME_STATE = "GAME_OVER"
 		playButton.setAttribute("disabled", "")
-		alert("GAME_OVER")
+		if (isNewTopScore()) {
+			TOP_SCORE = `${SCORE}`
+			updateUIElement(topScore, `${SCORE}`)
+			window.localStorage.setItem("topScore", TOP_SCORE)
+		}
+		alert(`GAME OVER, Score ${SCORE}`)
 	}
 
 	function resetGame() {
+		// resets score counter
+		SCORE = 0
+		updateUIElement(scoreDisplay, `0`)
 		// resets start button
 		playButton.innerHTML = "Start (Space)"
 		playButton.removeAttribute("disabled")
@@ -133,7 +162,10 @@
 			GAME_STATE = "PAUSE"
 			playButton.innerHTML = "Play (Space)"
 		}
+	}
 
+	function updateUIElement (elem: HTMLElement, value: string) {
+		elem.innerHTML = value
 	}
 
 	function drawBoard (){
@@ -204,6 +236,8 @@
 				do{
 					GOAL = generateRandomPointOnBoard()
 				} while (touchesSnakeBody(GOAL))
+				SCORE++
+				updateUIElement(scoreDisplay, `${SCORE}`)
 			} else {
 				SNAKE.body.shift()
 			}
